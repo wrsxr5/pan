@@ -1,0 +1,55 @@
+<button class="btn btn-sm btn-primary" (click)="dialog.showModal()">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke-width="1.5"
+    stroke="currentColor"
+    class="size-5"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      d="M12 4.5v15m7.5-7.5h-15"
+    />
+  </svg>
+  Add a library
+</button>
+<dialog #dialog class="modal">
+  <div class="modal-box">
+    <h2 class="text-lg font-bold">Add a library</h2>
+    <form [formGroup]="form" method="dialog">
+      <div class="my-7">
+        <label class="label mb-2" for="library-modal-label">Label</label>
+        <input
+          id="library-modal-label"
+          type="text"
+          placeholder="Enter the library label"
+          class="input w-full mb-5"
+          formControlName="label"
+        />
+
+        <label class="label mb-2" for="library-modal-path">Path</label>
+        <input
+          id="library-modal-path"
+          type="text"
+          placeholder="Enter the library path"
+          class="input w-full mb-5"
+          formControlName="path"
+        />
+      </div>
+
+      <div class="modal-action">
+        <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+        <button
+          type="submit"
+          class="btn btn-primary ml-5"
+          (click)="submit()"
+          [disabled]="form.invalid"
+        >
+          Add
+        </button>
+      </div>
+    </form>
+  </div>
+</dialog>

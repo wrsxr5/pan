@@ -1,0 +1,8 @@
+{
+  "name": "pan",
+  "private": "true",
+  "scripts": {
+    "start": "cd apps/server && bun start:prod"
+  },
+  "workspaces": ["apps/*", "libs/*"]
+}

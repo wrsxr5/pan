@@ -1,0 +1,12 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\panclient]
+@="Pan Client Handler"
+"URL Protocol"=""
+
+[HKEY_CLASSES_ROOT\panclient\shell]
+
+[HKEY_CLASSES_ROOT\panclient\shell\open]
+
+[HKEY_CLASSES_ROOT\panclient\shell\open\command]
+@="\"C:\\Users\\wrsxr5\\AppData\\Roaming\\npm\\bun\" \"C:\\Users\\wrsxr5\\workspace\\pan\\apps\\client\\client.ts\" \"%1\""

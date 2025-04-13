@@ -1,0 +1,127 @@
+@if (anime) {
+  <div class="card h-full w-full bg-base-100 shadow-lg">
+    <figure
+      class="px-4 pt-4 cursor-pointer h-83"
+      aria-hidden="true"
+      (click)="navigate()"
+    >
+      <img
+        [src]="'/api/content/image/' + anime.title.aid"
+        [alt]="anime.title.main || anime.title.aid"
+        class="rounded-xl object-cover h-full w-full"
+      />
+    </figure>
+    <div class="card-body items-center text-center">
+      @if (label().length > 0) {
+        <h2 class="card-title text-lg font-bold">
+          {{ label() }}
+        </h2>
+      }
+
+      @if (anime.info.season) {
+        <div
+          class="badge badge-soft"
+          [class.badge-success]="anime.info.season.endsWith('spring')"
+          [class.badge-error]="anime.info.season.endsWith('summer')"
+          [class.badge-warning]="anime.info.season.endsWith('autumn')"
+          [class.badge-info]="anime.info.season.endsWith('winter')"
+        >
+          {{ anime.info.season.split('/').slice(-2).join(' ') }}
+        </div>
+      }
+
+      @if (anime.info.type) {
+        <div class="text-sm font-semibold opacity-50">
+          {{ anime.info.type }}
+        </div>
+      }
+
+      <div class="flex items-center gap-2">
+        @if (anime.info.startDate) {
+          <div class="tooltip" data-tip="Start date">
+            {{ anime.info.startDate }}
+          </div>
+        }
+
+        @if (anime.info.startDate && anime.info.endDate) {
+          <div class="text-lg pb-1 font-bold">|</div>
+        }
+
+        @if (anime.info.endDate) {
+          <div class="tooltip" data-tip="End date">
+            {{ anime.info.endDate }}
+          </div>
+        }
+      </div>
+
+      <div class="flex gap-2">
+        @if (
+          anime.info.aggregateRating?.value && anime.info.aggregateRating?.count
+        ) {
+          <div class="tooltip" data-tip="Aggregate rating">
+            {{ anime.info.aggregateRating?.value?.toFixed(2) }}
+            ({{ anime.info.aggregateRating?.count }})
+          </div>
+        }
+
+        @if (
+          anime.info.averageRating?.value && anime.info.averageRating?.count
+        ) {
+          <div class="tooltip" data-tip="Average rating">
+            {{ anime.info.averageRating?.value?.toFixed(2) }}
+            ({{ anime.info.averageRating?.count }})
+          </div>
+        }
+      </div>
+
+      <div class="card-actions">
+        <a
+          [href]="'https://anidb.net/anime/' + anime.title.aid"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn btn-sm btn-ghost"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="size-4"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+            />
+          </svg>
+          anidb.net
+        </a>
+        @if (xLink().length > 0) {
+          <a
+            [href]="xLink()"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn btn-sm btn-ghost"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="size-4"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+              />
+            </svg>
+            x.com
+          </a>
+        }
+      </div>
+    </div>
+  </div>
+}

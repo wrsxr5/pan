@@ -1,0 +1,16 @@
+{
+  "name": "pan",
+  "private": "true",
+  "scripts": {
+    "postinstall": "bun init.ts",
+    "test:server": "cd apps/server && bun test",
+    "test:webui": "cd apps/webui && nx test",
+    "build:webui": "cd apps/webui && nx build",
+    "start": "cd apps/server && bun start:dev",
+    "serve": "cd apps/webui && nx serve"
+  },
+  "workspaces": [
+    "apps/*",
+    "libs/*"
+  ]
+}

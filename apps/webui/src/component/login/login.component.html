@@ -1,0 +1,65 @@
+<div class="h-dvh w-dvw bg-base-200 flex items-center justify-center">
+  <div class="card w-full max-w-md bg-base-100 shadow-xl">
+    <div class="card-body">
+      <h2 class="card-title text-2xl justify-center">Login</h2>
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <div class="w-full">
+          <label class="label" for="name">Username</label>
+          <input
+            id="name"
+            type="text"
+            autocomplete="username"
+            formControlName="name"
+            placeholder="Enter your username"
+            class="input mt-2 w-full"
+          />
+          <div
+            *ngIf="
+              loginForm.get('name')?.invalid && loginForm.get('name')?.touched
+            "
+            class="label mt-2"
+          >
+            <span class="text-error">Username is required.</span>
+          </div>
+        </div>
+
+        <div class="w-full mt-4">
+          <label class="label" for="password">Password</label>
+          <input
+            id="password"
+            type="password"
+            autocomplete="current-password"
+            formControlName="password"
+            placeholder="Enter your password"
+            class="input mt-2 w-full"
+          />
+          <div
+            *ngIf="
+              loginForm.get('password')?.invalid &&
+              loginForm.get('password')?.touched
+            "
+            class="label mt-2"
+          >
+            <span class="text-error"
+              >Password must be at least 4 characters.</span
+            >
+          </div>
+        </div>
+
+        <div *ngIf="errorMessage().length > 0" class="mt-4">
+          <div class="text-error text-center text-sm">{{ errorMessage() }}</div>
+        </div>
+
+        <div class="mt-6">
+          <button
+            type="submit"
+            class="btn btn-primary w-full"
+            [disabled]="loginForm.invalid"
+          >
+            Login
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

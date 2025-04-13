@@ -1,0 +1,345 @@
+<div class="h-full w-full p-4 overflow-y-auto overflow-x-hidden">
+  <!-- Theme -->
+  <div class="mb-13">
+    <h2 class="text-xl font-bold">Theme</h2>
+    <div class="divider"></div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-7 m-4">
+      @for (item of themes; track $index) {
+        <label class="label cursor-pointer">
+          <div
+            [attr.data-theme]="item.name === 'auto' ? autoTheme() : item.name"
+            class="bg-base-100 grid shrink-0 grid-cols-2 gap-1 rounded-lg p-1 shadow-sm mr-2"
+          >
+            <div class="bg-base-content size-2 rounded-full"></div>
+            <div class="bg-primary size-2 rounded-full"></div>
+            <div class="bg-secondary size-2 rounded-full"></div>
+            <div class="bg-accent size-2 rounded-full"></div>
+          </div>
+          <div class="mr-1">{{ item.label }}</div>
+          <input
+            type="radio"
+            name="theme"
+            class="radio"
+            [checked]="theme() === item.name"
+            (click)="setTheme(item.name)"
+          />
+        </label>
+      }
+    </div>
+  </div>
+
+  <!-- Library  -->
+  <div class="mb-13">
+    <div class="flex items-center gap-4">
+      <h2 class="text-xl font-bold">Library</h2>
+      <app-library-modal (result)="addLibrary($event)"></app-library-modal>
+    </div>
+    <div class="divider"></div>
+    <app-scanning-config
+      (configChanged)="checkScanningStatus($event)"
+    ></app-scanning-config>
+    <ul class="list">
+      @for (item of libraries(); track $index) {
+        <li class="list-row">
+          <div class="text-5xl font-thin opacity-50 tabular-nums">
+            {{ $index }}
+          </div>
+          <div class="font-semibold list-col-grow">
+            <div class="text-lg">
+              {{ item.library.label }}
+              @if (item.info) {
+                <div class="badge badge-sm badge-primary ml-1 mb-1">
+                  {{ item.info.matched }}
+                </div>
+              }
+            </div>
+            <div class="text-info">
+              Last scanned:
+              {{
+                (item.info?.lastScanned | date: 'YYYY-MM-dd HH:mm:ss') ||
+                  'never'
+              }}
+            </div>
+            <div class="text-xs opacity-50">{{ item.library.path }}</div>
+          </div>
+          @if (item.info) {
+            <div class="hidden md:flex">
+              <button
+                class="btn btn-ghost"
+                (click)="showScanningConfigDialog(item, 'OVERMATCHED')"
+              >
+                Overmatched: {{ item.info.overMatched }}
+              </button>
+              <button
+                class="btn btn-ghost"
+                (click)="showScanningConfigDialog(item, 'IGNORED')"
+              >
+                Ignored: {{ item.info.ignored | count }}
+              </button>
+              <button
+                class="btn btn-ghost"
+                (click)="showScanningConfigDialog(item, 'ASSIGNED')"
+              >
+                Assigned: {{ item.info.assigned | count }}
+              </button>
+            </div>
+          }
+          <div class="flex flex-col md:flex-row">
+            <button
+              class="btn btn-ghost tooltip"
+              data-tip="Move up"
+              (click)="swap($index - 1, $index)"
+              [disabled]="$index === 0 || scanning().length > 0"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m4.5 15.75 7.5-7.5 7.5 7.5"
+                />
+              </svg>
+            </button>
+            <button
+              class="btn btn-ghost tooltip"
+              data-tip="Move down"
+              (click)="swap($index, $index + 1)"
+              [disabled]="
+                $index === libraries().length - 1 || scanning().length > 0
+              "
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                />
+              </svg>
+            </button>
+            <button
+              class="btn btn-ghost tooltip"
+              data-tip="Scan"
+              (click)="scan(item.library)"
+              [disabled]="scanning().length > 0"
+            >
+              @if (scanning() === item.library.path) {
+                <span class="loading loading-spinner text-success"></span>
+              } @else {
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="size-6 text-success"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
+                  />
+                </svg>
+              }
+            </button>
+            <button
+              class="btn btn-ghost tooltip"
+              data-tip="Remove"
+              (click)="
+                checkLibrary(item.library.path); removeLibraryDialog.showModal()
+              "
+              [disabled]="scanning().length > 0"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-6 text-error"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                />
+              </svg>
+            </button>
+            <dialog #removeLibraryDialog class="modal">
+              <div class="modal-box">
+                <h2 class="text-lg font-bold">
+                  @if (isRemovable()) {
+                    Remove library {{ item.library.label }}
+                  } @else {
+                    Library {{ item.library.label }} is in use
+                  }
+                </h2>
+                <form method="dialog">
+                  <div class="modal-action">
+                    <button class="btn btn-secondary">Cancel</button>
+                    <button
+                      type="submit"
+                      class="btn btn-primary ml-5"
+                      (click)="removeLibrary($index)"
+                      [disabled]="!isRemovable()"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </dialog>
+          </div>
+        </li>
+      }
+    </ul>
+  </div>
+
+  <!-- Action  -->
+  <div class="mb-13">
+    <div class="flex items-center gap-4">
+      <h2 class="text-xl font-bold">Action</h2>
+      <app-action-modal (result)="addAction($event)"></app-action-modal>
+    </div>
+    <div class="divider"></div>
+    <ul class="list">
+      @for (item of actions(); track $index) {
+        <li class="list-row">
+          <div class="text-5xl font-thin opacity-50 tabular-nums">
+            {{ $index }}
+          </div>
+          <div class="font-semibold list-col-grow">
+            <div class="text-lg">
+              {{ item.name }}
+              <div
+                class="badge badge-sm ml-1 mb-1"
+                [class.badge-primary]="item.type === 'CLIENT'"
+                [class.badge-secondary]="item.type === 'SERVER'"
+              >
+                {{ item.type }}
+              </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row md:gap-5 opacity-50">
+              @if (item.selectedTitle) {
+                <div>Selected title</div>
+              }
+              @if (item.library) {
+                <div>Library</div>
+              }
+              @if (item.libraryInfo) {
+                <div>Library info</div>
+              }
+              @if (item.libraryTitles) {
+                <div>Library titles</div>
+              }
+            </div>
+          </div>
+          <div class="flex flex-col md:flex-row">
+            @if (item.isDefault) {
+              <button
+                class="btn btn-ghost tooltip"
+                data-tip="Unset default action"
+                (click)="setDefaultAction('')"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="size-6 text-warning"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"
+                  />
+                </svg>
+              </button>
+            } @else {
+              <button
+                class="btn btn-ghost tooltip"
+                data-tip="Set as default action"
+                (click)="setDefaultAction(item.name)"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="size-6 text-warning"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"
+                  />
+                </svg>
+              </button>
+            }
+            <button
+              class="btn btn-ghost tooltip"
+              data-tip="Remove"
+              (click)="removeActionDialog.showModal()"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-6 text-error"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                />
+              </svg>
+            </button>
+            <dialog #removeActionDialog class="modal">
+              <div class="modal-box">
+                <h2 class="text-lg font-bold">Remove Action {{ item.name }}</h2>
+                <form method="dialog">
+                  <div class="modal-action">
+                    <button class="btn btn-secondary">Cancel</button>
+                    <button
+                      type="submit"
+                      class="btn btn-primary ml-5"
+                      (click)="removeAction(item.name)"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </dialog>
+          </div>
+        </li>
+      }
+    </ul>
+  </div>
+
+  <!-- Log -->
+  <div class="mb-13">
+    <div class="flex items-center gap-4">
+      <h2 class="text-xl font-bold">Log</h2>
+      <app-log-modal></app-log-modal>
+    </div>
+    <div class="divider"></div>
+  </div>
+</div>

@@ -1,0 +1,26 @@
+<div
+  #container
+  [@fadeAnimation]="isLoading() ? 'hidden' : 'visible'"
+  (@fadeAnimation.done)="onAnimationEnd($event)"
+  class="h-full"
+  cdkVirtualScrollingElement
+>
+  <cdk-virtual-scroll-viewport #viewport itemSize="620" class="h-full">
+    <div *cdkVirtualFor="let row of rows()">
+      <div
+        class="grid gap-5"
+        [style.grid-template-columns]="
+          'repeat(' + rowSize() + ', minmax(0, 1fr))'
+        "
+      >
+        @for (title of row; track $index) {
+          <app-anime-card
+            class="h-[600px] mb-[20px]"
+            [root]="library()"
+            [title]="title"
+          ></app-anime-card>
+        }
+      </div>
+    </div>
+  </cdk-virtual-scroll-viewport>
+</div>

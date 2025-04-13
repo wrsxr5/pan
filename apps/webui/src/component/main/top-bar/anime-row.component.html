@@ -1,0 +1,26 @@
+<li
+  class="list-row cursor-pointer hover:bg-base-300"
+  aria-hidden="true"
+  (click)="selected.emit()"
+>
+  <div class="flex items-center justify-center h-23 w-23">
+    <figure>
+      <img
+        [src]="'/api/content/image/' + anime().title.aid"
+        [alt]="anime().title.main || anime().title.aid"
+        class="rounded-xl object-cover h-23 w-23 cursor-pointer"
+        (click)="selected.emit()"
+        aria-hidden="true"
+      />
+    </figure>
+  </div>
+
+  <div class="font-semibold">
+    <div class="text-lg">
+      {{ anime().title.ja?.main || anime().title.main }}
+    </div>
+    <div class="text-xs opacity-50">
+      {{ anime().path }}
+    </div>
+  </div>
+</li>

@@ -1,0 +1,25 @@
+services:
+  pan:
+    container_name: pan
+    build: .
+    restart: unless-stopped
+    ports:
+      - "34567:3000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/pan
+    volumes:
+      - ./apps/server/data:/app/apps/server/data
+    depends_on:
+      - db
+    logging:
+      options:
+        max-size: 2m
+
+  db:
+    image: postgres:latest
+    container_name: pan-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: pan
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres

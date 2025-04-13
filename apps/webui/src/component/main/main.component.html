@@ -1,0 +1,87 @@
+<div class="h-dvh w-dvw bg-base-100">
+  <app-top-bar
+    (toggleSideNav)="toggleSideNav()"
+    (openHome)="goHome()"
+    (openSettings)="goToSettings()"
+    (enterTitle)="goToTitle($event)"
+  ></app-top-bar>
+  <div class="flex h-[calc(100dvh-4rem)]">
+    <div
+      [@sideNavAnimation]="sideNavOpen() ? 'visible' : 'hidden'"
+      (@sideNavAnimation.start)="onSideNavAnimationStart($event)"
+      (@sideNavAnimation.done)="onSideNavAnimationEnd($event)"
+      class="h-full bg-base-100 overflow-y-auto overflow-x-hidden absolute z-1 md:relative md:z-0"
+    >
+      @if (showSideNavContent()) {
+        <ul class="menu w-full">
+          <li class="menu-title w-full">Libraries</li>
+          @for (item of libraries(); track $index) {
+            <li class="w-full">
+              <a
+                class="flex items-center gap-4 py-3"
+                aria-hidden="true"
+                (click)="goToIndex(item.library.index)"
+                [class.menu-active]="index() === item.library.index"
+              >
+                <span class="flex-1 break-all">
+                  {{ item.library.label }}
+                </span>
+                @if (item.info) {
+                  <span class="badge badge-primary badge-sm">
+                    {{ item.info.matched }}
+                  </span>
+                }
+              </a>
+            </li>
+          }
+
+          @if (bookmarks().length > 0) {
+            <li class="menu-title w-full mt-7">Bookmarks</li>
+            @for (item of bookmarks(); track $index) {
+              <li class="w-full">
+                <a
+                  class="flex items-center py-3"
+                  aria-hidden="true"
+                  (click)="goToBookmark(item)"
+                >
+                  <span class="flex-1 break-all">
+                    {{ item.label }}
+                  </span>
+                </a>
+              </li>
+            }
+          }
+
+          @if (hasTitle()) {
+            <li class="w-full mt-7">
+              <a
+                class="flex items-center py-3"
+                aria-hidden="true"
+                (click)="goToRandomTitle()"
+              >
+                <span class="flex-1 break-all">Random title</span>
+              </a>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+    <div class="h-full w-full ml-4">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>
+
+@if (toast()) {
+  <div class="toast" [@enterLeaveAnimation]>
+    <div
+      class="alert alert-soft"
+      [class.alert-success]="toast()?.style === 'success'"
+      [class.alert-info]="toast()?.style === 'info'"
+      [class.alert-warning]="toast()?.style === 'warning'"
+      [class.alert-error]="toast()?.style === 'error'"
+    >
+      <span>{{ toast()?.message }}</span>
+    </div>
+  </div>
+}

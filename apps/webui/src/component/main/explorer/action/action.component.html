@@ -1,0 +1,43 @@
+@if (actions().length > 0) {
+  <button
+    class="btn btn-ghost btn-circle mr-2"
+    popovertarget="toolbar-action"
+    style="anchor-name: --toolbar-action"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke-width="1.5"
+      stroke="currentColor"
+      class="size-6"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z"
+      />
+    </svg>
+  </button>
+  <ul
+    class="dropdown dropdown-end menu p-2 shadow bg-base-200 rounded-box"
+    popover
+    id="toolbar-action"
+    style="position-anchor: --toolbar-action"
+  >
+    @for (item of actions(); track $index) {
+      <li>
+        <button (click)="run(item)">
+          {{ item.name }}
+          <div
+            class="badge badge-sm ml-1"
+            [class.badge-primary]="item.type === 'CLIENT'"
+            [class.badge-secondary]="item.type === 'SERVER'"
+          >
+            {{ item.type }}
+          </div>
+        </button>
+      </li>
+    }
+  </ul>
+}

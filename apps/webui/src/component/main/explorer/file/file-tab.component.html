@@ -1,0 +1,26 @@
+<div class="flex flex-col h-full w-full">
+  <app-breadcrumbs
+    class="grid grid-cols-1"
+    [items]="breadcrumbs()"
+    (selected)="onClickPathItem($event)"
+  ></app-breadcrumbs>
+
+  <div class="grow min-h-0 h-full w-full">
+    <div class="flex h-full w-full">
+      <app-file-list
+        class="grow h-full overflow-y-auto overflow-x-hidden"
+        [entries]="entries()"
+        (selected)="enter($event)"
+        [@fadeAnimation]="isLoading() ? 'hidden' : 'visible'"
+        (@fadeAnimation.done)="onAnimationEnd($event)"
+      ></app-file-list>
+      @if (title()) {
+        <app-anime-panel
+          class="shrink-0 h-full w-0 md:w-67 overflow-y-auto overflow-x-hidden"
+          [anime]="title()"
+          [@enterLeaveAnimation]
+        ></app-anime-panel>
+      }
+    </div>
+  </div>
+</div>
