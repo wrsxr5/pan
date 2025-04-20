@@ -1,3 +1,4 @@
+import { unlinkSync } from "fs";
 import { normalize } from "path";
 
 interface Input {
@@ -53,6 +54,12 @@ function open({ selectedEntries, directory }: ActionContext) {
   return openApp("explorer", selectedEntries[0] || directory);
 }
 
+function remove({ selectedEntries }: ActionContext) {
+  for (const path of selectedEntries) {
+    unlinkSync(clientPathOf(path));
+  }
+}
+
 async function main() {
   const input = parseArg();
   if (!input) return;
@@ -63,6 +70,8 @@ async function main() {
     console.log("context:", context);
     if (input.name === "open") {
       open(context);
+    } else if (input.name === "remove") {
+      remove(context);
     }
   } catch (err) {
     console.error(err);

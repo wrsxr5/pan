@@ -27,6 +27,7 @@ import {
 import { LibraryService } from 'src/service/library.service';
 import { SelectionService } from 'src/service/selection.service';
 import { ToastService } from 'src/service/toast.service';
+import { sortWith } from 'src/service/util';
 import { AnimePanelComponent } from './anime-panel.component';
 import { BreadcrumbsComponent, PathItem } from './breadcrumbs.component';
 import { EntryItem, FileListComponent } from './file-list.component';
@@ -170,10 +171,21 @@ export class FileTabComponent implements OnDestroy {
       .sort((a, b) => {
         if (a.isDirectory && !b.isDirectory) return -1;
         if (!a.isDirectory && b.isDirectory) return 1;
-        if (sort === 'NAME_R') {
-          return b.name.localeCompare(a.name);
+        const fallback = () => sortWith(a, b, { by: 'name' });
+        switch (sort) {
+          case 'NAME_R':
+            return sortWith(b, a, { by: 'name' });
+          case 'LAST_MODIFIED':
+            return sortWith(a, b, { by: 'lastModified', fallback });
+          case 'LAST_MODIFIED_R':
+            return sortWith(b, a, { by: 'lastModified', fallback });
+          case 'SIZE':
+            return sortWith(a, b, { by: 'size', fallback });
+          case 'SIZE_R':
+            return sortWith(b, a, { by: 'size', fallback });
+          default:
+            return fallback();
         }
-        return a.name.localeCompare(b.name);
       });
     this.entries.set(entries);
     this.breadcrumbs.set(this.rawBreadcrumbs);
@@ -182,7 +194,10 @@ export class FileTabComponent implements OnDestroy {
   private asEntryItem(entry: Entry): EntryItem {
     const extension = getExtension(entry);
     return {
-      ...entry,
+      name: entry.name,
+      isDirectory: entry.isDirectory,
+      size: entry.isDirectory ? 0 : entry.size,
+      lastModified: entry.isDirectory ? 0 : entry.lastModified,
       type: getType(extension),
       extension,
     };

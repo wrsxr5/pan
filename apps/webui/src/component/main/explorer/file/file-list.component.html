@@ -124,8 +124,18 @@
         <td class="w-full whitespace-normal">
           {{ entry.name }}
         </td>
-        <td>
+        <td class="hidden md:table-cell">
           {{ entry.extension }}
+        </td>
+        <td class="hidden md:table-cell whitespace-nowrap">
+          {{
+            entry.isDirectory
+              ? ''
+              : (entry.lastModified | date: 'YYYY-MM-dd HH:mm:ss')
+          }}
+        </td>
+        <td class="hidden md:table-cell whitespace-nowrap">
+          {{ entry.isDirectory ? '' : (entry.size | fileSize) }}
         </td>
       </tr>
     }

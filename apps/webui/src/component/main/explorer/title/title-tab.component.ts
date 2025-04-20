@@ -30,7 +30,16 @@ import {
   REFRESH_CURRENT_TAB_EVENT,
 } from 'src/service/explorer.service';
 import { LibraryService } from 'src/service/library.service';
+import { sortWith } from 'src/service/util';
 import { AnimeCardComponent } from './anime-card.component';
+
+function BY_LABEL(t: LibraryTitle) {
+  return labelOf(t.title);
+}
+
+function BY_DATE(t: LibraryTitle) {
+  return t.info.startDate || seasonToDate(t.info.season);
+}
 
 function debounce(fn: () => void, ms = 23) {
   let timer = 0;
@@ -180,19 +189,6 @@ export class TitleTabComponent implements AfterViewInit, OnDestroy {
     );
   }
 
-  private sortByName(a: LibraryTitle, b: LibraryTitle) {
-    return labelOf(a.title).localeCompare(labelOf(b.title));
-  }
-
-  private sortByAired(a: LibraryTitle, b: LibraryTitle) {
-    const da = a.info.startDate || seasonToDate(a.info.season);
-    const db = b.info.startDate || seasonToDate(b.info.season);
-    if (da === db) {
-      return this.sortByName(a, b);
-    }
-    return da.localeCompare(db);
-  }
-
   private applyConfig() {
     const filter = this.filter;
     const sort = this.sort;
@@ -208,15 +204,16 @@ export class TitleTabComponent implements AfterViewInit, OnDestroy {
         return true;
       })
       .sort((a, b) => {
+        const fallback = () => sortWith(a, b, { by: BY_LABEL });
         switch (sort) {
-          case 'NAME':
-            return this.sortByName(a, b);
           case 'NAME_R':
-            return this.sortByName(b, a);
+            return sortWith(b, a, { by: BY_LABEL });
           case 'AIRED':
-            return this.sortByAired(a, b);
+            return sortWith(a, b, { by: BY_DATE, fallback });
           case 'AIRED_R':
-            return this.sortByAired(b, a);
+            return sortWith(b, a, { by: BY_DATE, fallback });
+          default:
+            return fallback();
         }
       });
     this.titles = titles;

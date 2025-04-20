@@ -58,13 +58,13 @@
                 [class.text-warning]="entry.level === 'WARNING'"
                 [class.text-error]="entry.level === 'ERROR'"
               >
-                <td class="min-w-43 max-w-43">
+                <td class="whitespace-nowrap">
                   {{ entry.timestamp | date: 'YYYY-MM-dd HH:mm:ss' }}
                 </td>
-                <td class="min-w-23 max-w-23">
+                <td class="whitespace-nowrap">
                   {{ entry.source }}
                 </td>
-                <td class="min-w-23 max-w-23">
+                <td class="whitespace-nowrap">
                   {{ entry.level }}
                 </td>
                 <td class="w-full">

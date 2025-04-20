@@ -2,10 +2,19 @@ export interface Path {
   path: string;
 }
 
-export interface Entry {
+interface DirectoryEntry {
   name: string;
-  isDirectory: boolean;
+  isDirectory: true;
 }
+
+interface FileEntry {
+  name: string;
+  isDirectory: false;
+  size: number;
+  lastModified: number;
+}
+
+export type Entry = DirectoryEntry | FileEntry;
 
 export const Tabs = {
   TITLE: {
@@ -50,6 +59,22 @@ export const Sorts = {
     {
       name: 'NAME_R',
       label: 'Sort by name (Z-A)',
+    },
+    {
+      name: 'LAST_MODIFIED',
+      label: 'Sort by date (old to new)',
+    },
+    {
+      name: 'LAST_MODIFIED_R',
+      label: 'Sort by date (new to old)',
+    },
+    {
+      name: 'SIZE',
+      label: 'Sort by size (small to big)',
+    },
+    {
+      name: 'SIZE_R',
+      label: 'Sort by size (big to small)',
     },
   ],
 } as const;
