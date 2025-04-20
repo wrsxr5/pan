@@ -30,6 +30,7 @@ Pan (Personal Anime Note) is a self-hosted web application designed for managing
       - [Server Action](#server-action)
   - [Acknowledgements](#acknowledgements)
   - [License](#license)
+  - [Changelog](#changelog)
 
 ## Setup
 
@@ -186,3 +187,7 @@ This project is made possible thanks to the following open-source libraries and 
 ## License
 
 [MIT License](LICENSE)
+
+## Changelog
+
+[CHANGELOG.md](CHANGELOG.md)
