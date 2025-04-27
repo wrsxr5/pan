@@ -6,6 +6,7 @@ import { EventService } from './event.service';
 import { sharedRequest } from './util';
 
 export const BOOKMARK_CHANGED_EVENT = 'BOOKMARK_CHANGED';
+export const BOOKMARK_OPENED_EVENT = 'BOOKMARK_OPENED';
 
 @Injectable({
   providedIn: 'root',
@@ -13,6 +14,7 @@ export const BOOKMARK_CHANGED_EVENT = 'BOOKMARK_CHANGED';
 export class BookmarkService {
   private readonly CONFIG_KEY = 'BOOKMARK';
   private bookmarks: Bookmark[] | null = null;
+  openedBookmark: Bookmark | null = null;
 
   constructor(
     private configService: ConfigService,
@@ -66,5 +68,10 @@ export class BookmarkService {
     }
     this.bookmarks = this.bookmarks.filter((v) => v.path !== bookmark.path);
     this.setConfig().subscribe();
+  }
+
+  setOpenedBookmark(bookmark: Bookmark | null) {
+    this.openedBookmark = bookmark;
+    this.eventService.emit(BOOKMARK_OPENED_EVENT);
   }
 }

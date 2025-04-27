@@ -1,3 +1,5 @@
+import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
+import { afterNextRender } from '@angular/core';
 import { finalize, Observable, shareReplay } from 'rxjs';
 
 export function sharedRequest<T>(req: () => Observable<T>) {
@@ -36,4 +38,29 @@ export function sortWith<T, S extends number | string>(
   return typeof ta === 'number' && typeof tb === 'number'
     ? ta - tb
     : String(ta).localeCompare(String(tb));
+}
+
+// https://github.com/angular/components/pull/29777
+export function patchScrollViewport(viewport: CdkVirtualScrollViewport) {
+  viewport['_doChangeDetection'] = () => {
+    if (viewport['_isDestroyed']) {
+      return;
+    }
+    viewport['ngZone'].run(() => {
+      viewport['_changeDetectorRef'].markForCheck();
+      afterNextRender(
+        () => {
+          viewport['_contentWrapper'].nativeElement.style.transform =
+            viewport['_renderedContentTransform'];
+          viewport['_isChangeDetectionPending'] = false;
+          const runAfterChangeDetection = viewport['_runAfterChangeDetection'];
+          viewport['_runAfterChangeDetection'] = [];
+          for (const fn of runAfterChangeDetection) {
+            fn();
+          }
+        },
+        { injector: viewport['_injector'] },
+      );
+    });
+  };
 }

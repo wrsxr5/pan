@@ -43,6 +43,7 @@
                   class="flex items-center py-3"
                   aria-hidden="true"
                   (click)="goToBookmark(item)"
+                  [class.menu-active]="bookmark() === item"
                 >
                   <span class="flex-1 break-all">
                     {{ item.label }}

@@ -4,7 +4,6 @@ import {
   ScrollingModule,
 } from '@angular/cdk/scrolling';
 import {
-  afterNextRender,
   AfterViewInit,
   ChangeDetectionStrategy,
   Component,
@@ -30,7 +29,7 @@ import {
   REFRESH_CURRENT_TAB_EVENT,
 } from 'src/service/explorer.service';
 import { LibraryService } from 'src/service/library.service';
-import { sortWith } from 'src/service/util';
+import { patchScrollViewport, sortWith } from 'src/service/util';
 import { AnimeCardComponent } from './anime-card.component';
 
 function BY_LABEL(t: LibraryTitle) {
@@ -91,30 +90,7 @@ export class TitleTabComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit() {
     this.setRowSize();
-    // https://github.com/angular/components/pull/29777
-    const viewport = this.viewport();
-    viewport['_doChangeDetection'] = () => {
-      if (viewport['_isDestroyed']) {
-        return;
-      }
-      viewport['ngZone'].run(() => {
-        viewport['_changeDetectorRef'].markForCheck();
-        afterNextRender(
-          () => {
-            viewport['_contentWrapper'].nativeElement.style.transform =
-              viewport['_renderedContentTransform'];
-            viewport['_isChangeDetectionPending'] = false;
-            const runAfterChangeDetection =
-              viewport['_runAfterChangeDetection'];
-            viewport['_runAfterChangeDetection'] = [];
-            for (const fn of runAfterChangeDetection) {
-              fn();
-            }
-          },
-          { injector: viewport['_injector'] },
-        );
-      });
-    };
+    patchScrollViewport(this.viewport());
   }
 
   private setRowSize() {

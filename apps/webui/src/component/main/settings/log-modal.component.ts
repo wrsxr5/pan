@@ -1,30 +1,42 @@
+import {
+  CdkVirtualScrollViewport,
+  ScrollingModule,
+} from '@angular/cdk/scrolling';
 import { DatePipe } from '@angular/common';
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
   OnDestroy,
   signal,
+  viewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { escapeRegExp, LOG_TOPIC, type LogEntry } from '@pan/types';
 import { map, Subscription, switchMap, tap } from 'rxjs';
 import { LogService } from 'src/service/log.service';
 import { SocketService } from 'src/service/socket.service';
+import { patchScrollViewport } from 'src/service/util';
 
 @Component({
   selector: 'app-log-modal',
   templateUrl: './log-modal.component.html',
-  imports: [DatePipe, FormsModule],
+  imports: [DatePipe, FormsModule, ScrollingModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LogModalComponent implements OnDestroy {
+export class LogModalComponent implements AfterViewInit, OnDestroy {
   filter = '';
   logs = signal<LogEntry[]>([]);
   private rawLogs: LogEntry[] = [];
   private subscriptions: Subscription[] = [];
+  private viewport = viewChild.required<CdkVirtualScrollViewport>('viewport');
 
   ngOnDestroy() {
     this.close();
+  }
+
+  ngAfterViewInit() {
+    patchScrollViewport(this.viewport());
   }
 
   constructor(
@@ -73,6 +85,7 @@ export class LogModalComponent implements OnDestroy {
 
   close() {
     this.filter = '';
+    this.logs.set([]);
     this.subscriptions.forEach((s) => s.unsubscribe());
     this.logService.stream(false).subscribe();
   }

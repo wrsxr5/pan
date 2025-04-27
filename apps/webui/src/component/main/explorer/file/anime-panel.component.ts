@@ -12,7 +12,6 @@ import {
   BookmarkService,
 } from 'src/service/bookmark.service';
 import { EventService } from 'src/service/event.service';
-import { LibraryService } from 'src/service/library.service';
 
 @Component({
   selector: 'app-anime-panel',
@@ -29,7 +28,6 @@ export class AnimePanelComponent implements OnDestroy {
   constructor(
     private bookmarkService: BookmarkService,
     private eventService: EventService,
-    private libraryService: LibraryService,
   ) {
     this.subscription = this.eventService
       .on(BOOKMARK_CHANGED_EVENT)
@@ -38,6 +36,7 @@ export class AnimePanelComponent implements OnDestroy {
 
   ngOnDestroy() {
     this.subscription.unsubscribe();
+    this.bookmarkService.setOpenedBookmark(null);
   }
 
   @Input() set anime(value: LibraryTitle | null) {
@@ -80,10 +79,13 @@ export class AnimePanelComponent implements OnDestroy {
     if (this.anime) {
       const path = this.anime.path;
       this.bookmarkService.get().subscribe((bookmarks) => {
-        this.isBookmarked.set(bookmarks.some((v) => v.path === path));
+        const bookmark = bookmarks.find((v) => v.path === path) || null;
+        this.isBookmarked.set(bookmark !== null);
+        this.bookmarkService.setOpenedBookmark(bookmark);
       });
     } else {
       this.isBookmarked.set(false);
+      this.bookmarkService.setOpenedBookmark(null);
     }
   }
 }

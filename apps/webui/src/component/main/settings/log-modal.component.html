@@ -41,40 +41,29 @@
       />
     </label>
     <form method="dialog">
-      <div class="max-h-[67vh] overflow-auto">
-        <table class="table table-zebra table-pin-rows">
-          <thead>
-            <tr>
-              <td>Timestamp</td>
-              <td>Source</td>
-              <td>Level</td>
-              <td>Message</td>
-            </tr>
-          </thead>
+      <cdk-virtual-scroll-viewport
+        #viewport
+        itemSize="48"
+        class="h-[67vh] overflow-auto"
+      >
+        <table class="table">
           <tbody>
-            @for (entry of logs(); track $index) {
-              <tr
-                [class.text-info]="entry.level === 'INFO'"
-                [class.text-warning]="entry.level === 'WARNING'"
-                [class.text-error]="entry.level === 'ERROR'"
-              >
-                <td class="whitespace-nowrap">
-                  {{ entry.timestamp | date: 'YYYY-MM-dd HH:mm:ss' }}
-                </td>
-                <td class="whitespace-nowrap">
-                  {{ entry.source }}
-                </td>
-                <td class="whitespace-nowrap">
-                  {{ entry.level }}
-                </td>
-                <td class="w-full">
-                  {{ entry.message }}
-                </td>
-              </tr>
-            }
+            <tr
+              *cdkVirtualFor="let entry of logs(); let odd = odd"
+              class="whitespace-nowrap h-[48px]"
+              [class.text-info]="entry.level === 'INFO'"
+              [class.text-warning]="entry.level === 'WARNING'"
+              [class.text-error]="entry.level === 'ERROR'"
+              [class.bg-base-200]="odd"
+            >
+              <td>{{ entry.timestamp | date: 'YYYY-MM-dd HH:mm:ss' }}</td>
+              <td>{{ entry.source }}</td>
+              <td>{{ entry.level }}</td>
+              <td class="w-full">{{ entry.message }}</td>
+            </tr>
           </tbody>
         </table>
-      </div>
+      </cdk-virtual-scroll-viewport>
 
       <div class="modal-action">
         <button class="btn btn-secondary" (click)="close()">Close</button>

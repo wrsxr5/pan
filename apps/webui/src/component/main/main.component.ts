@@ -29,6 +29,7 @@ import { filter, switchMap, tap, type Subscription } from 'rxjs';
 import { enterLeaveAnimation } from 'src/animation/fade.animation';
 import {
   BOOKMARK_CHANGED_EVENT,
+  BOOKMARK_OPENED_EVENT,
   BookmarkService,
 } from 'src/service/bookmark.service';
 import { EventService } from 'src/service/event.service';
@@ -66,6 +67,7 @@ export class MainComponent implements OnDestroy {
   libraries = signal<LibraryDetail[]>([]);
   hasTitle = signal(false);
   bookmarks = signal<Bookmark[]>([]);
+  bookmark = signal<Bookmark | null>(null);
   index = signal(0);
   toast = signal<Toast | null>(null);
   private subscriptions: Subscription[] = [];
@@ -130,6 +132,12 @@ export class MainComponent implements OnDestroy {
       this.eventService
         .on(LIBRARY_CHANGED_EVENT)
         .pipe(switchMap(() => this.refreshLibraries()))
+        .subscribe(),
+    );
+    this.subscriptions.push(
+      this.eventService
+        .on(BOOKMARK_OPENED_EVENT)
+        .pipe(tap(() => this.bookmark.set(this.bookmarkService.openedBookmark)))
         .subscribe(),
     );
     this.subscriptions.push(
